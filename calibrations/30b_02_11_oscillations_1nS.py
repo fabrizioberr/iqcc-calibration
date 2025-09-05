@@ -32,8 +32,7 @@ from iqcc_calibration_tools.qualibrate_config.qualibrate.node import Qualibratio
 from iqcc_calibration_tools.quam_config.components import Quam
 from iqcc_calibration_tools.quam_config.macros import active_reset, readout_state, readout_state_gef, active_reset_gef
 from iqcc_calibration_tools.analysis.plot_utils import QubitPairGrid, grid_iter, grid_pair_names
-from iqcc_calibration_tools.storage.save_utils import fetch_results_as_xarray, get_node_id, load_dataset, save_node
-from iqcc_calibration_tools.analysis.fit import fit_oscillation
+from iqcc_calibration_tools.storage.save_utils import fetch_results_as_xarray, load_dataset
 from qualang_tools.results import progress_counter, fetching_tool
 from qualang_tools.loops import from_array
 from qualang_tools.multi_user import qm_session
@@ -43,9 +42,8 @@ from qm.qua import *
 from typing import Literal, Optional, List
 import matplotlib.pyplot as plt
 import numpy as np
-import warnings
 from qualang_tools.bakery import baking
-from iqcc_calibration_tools.analysis.fit import fit_oscillation_decay_exp, oscillation_decay_exp
+from qualibration_libs.analysis import fit_oscillation_decay_exp, oscillation_decay_exp
 from iqcc_calibration_tools.analysis.plot_utils import QubitPairGrid, grid_iter, grid_pair_names
 from scipy.optimize import curve_fit
 from iqcc_calibration_tools.quam_config.components.gates.two_qubit_gates import CZGate
@@ -71,7 +69,7 @@ class Parameters(NodeParameters):
 node = QualibrationNode(
     name="30b_02_11_oscillations_1nS", parameters=Parameters()
 )
-node_id = get_node_id()
+
 assert not (node.parameters.simulate and node.parameters.load_data_id is not None), "If simulate is True, load_data_id must be None, and vice versa."
 
 # %% {Initialize_QuAM_and_QOP}
@@ -384,7 +382,7 @@ if not node.parameters.simulate:
         ax2.set_ylabel('Flux amplitude [V]')
         ax.set_ylabel('Detuning [MHz]')
         
-    plt.suptitle(f'control qubit state \n {date_time} GMT+3 #{node_id} \n reset type = {node.parameters.reset_type}')
+    plt.suptitle(f'control qubit state \n {date_time} GMT+3 #{node.node_id} \n reset type = {node.parameters.reset_type}')
     plt.tight_layout()
     plt.show()
     node.results["figure_control"] = grid.fig
@@ -415,7 +413,7 @@ if not node.parameters.simulate:
         ax2.set_ylabel('Flux amplitude [V]')
         ax.set_ylabel('Detuning [MHz]')
         
-    plt.suptitle(f'target qubit state \n {date_time} GMT+3 #{node_id} \n reset type = {node.parameters.reset_type}')
+    plt.suptitle(f'target qubit state \n {date_time} GMT+3 #{node.node_id} \n reset type = {node.parameters.reset_type}')
     plt.tight_layout()
     plt.show()
     node.results["figure_target"] = grid.fig

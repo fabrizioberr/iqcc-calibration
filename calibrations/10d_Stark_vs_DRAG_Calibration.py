@@ -124,10 +124,6 @@ with program() as stark_drag_2d_calibration:
     if node.parameters.use_state_discrimination:
         state = [declare(bool) for _ in range(num_qubits)]
         state_stream = [declare_stream() for _ in range(num_qubits)]
-    df = declare(int)  # QUA variable for the qubit drive detuning
-    a = declare(fixed)  # QUA variable for the qubit drive amplitude pre-factor
-    npi = declare(int)  # QUA variable for the number of qubit pulses
-    count = declare(int)  # QUA variable for counting the qubit pulses
 
     if flux_point == "joint":
         # Bring the active qubits to the desired frequency point
@@ -135,6 +131,13 @@ with program() as stark_drag_2d_calibration:
     
     
     for i, qubit in enumerate(qubits):
+        
+        n = declare(int)
+        df = declare(int)  # QUA variable for the qubit drive detuning
+        a = declare(fixed)  # QUA variable for the qubit drive amplitude pre-factor
+        npi = declare(int)  # QUA variable for the number of qubit pulses
+        count = declare(int)  # QUA variable for counting the qubit pulses
+        
         # Bring the active qubits to the desired frequency point
         if flux_point != "joint":
             machine.set_all_fluxes(flux_point=flux_point, target=qubit)
@@ -332,6 +335,70 @@ if not node.parameters.simulate:
     plt.tight_layout()
     plt.show()
     node.results["figure"] = grid.fig
+
+    # %% {State Measurement at Optimal DRAG Analysis}
+    # Extract state measurement values at optimal drag points for each detuning
+    for qubit in qubits:
+        qubit_data = state_n.sel(qubit=qubit.name)
+        
+        # Extract minimum state value and corresponding alpha for each detuning
+        detuning_values = qubit_data.freq.values * 1e-6  # Convert to MHz
+        optimal_state_values = []
+        optimal_alphas = []
+        
+        for i, detuning in enumerate(detuning_values):
+            # Get the slice of data for this detuning
+            detuning_slice = qubit_data.isel(freq=i)
+            # Find the minimum value index for this detuning
+            min_idx = detuning_slice.argmin()
+            # Get the corresponding state value and alpha
+            optimal_state_value = detuning_slice.isel(amp=min_idx).values
+            optimal_alpha = ds.alpha.sel(qubit=qubit.name).isel(amp=min_idx).values
+            optimal_state_values.append(optimal_state_value)
+            optimal_alphas.append(optimal_alpha)
+        
+        optimal_state_values = np.array(optimal_state_values)
+        optimal_alphas = np.array(optimal_alphas)
+        
+        # Create the plot
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+        
+        # Plot 1: State measurement value at optimal drag vs detuning
+        ax1.scatter(detuning_values, optimal_state_values, color='blue', s=50, alpha=0.7)
+        ax1.set_xlabel('Detuning [MHz]')
+        ax1.set_ylabel('State measurement value at optimal DRAG')
+        ax1.set_title(f'State Value at Optimal DRAG vs Detuning for {qubit.name}')
+        ax1.grid(True, alpha=0.3)
+        
+        # Plot 2: Optimal DRAG coefficient vs detuning
+        ax2.scatter(detuning_values, optimal_alphas, color='red', s=50, alpha=0.7)
+        ax2.set_xlabel('Detuning [MHz]')
+        ax2.set_ylabel('Optimal DRAG coefficient α')
+        ax2.set_title(f'Optimal DRAG vs Detuning for {qubit.name}')
+        ax2.grid(True, alpha=0.3)
+        
+        # Add the data to the results
+        if 'optimal_drag_analysis' not in node.results:
+            node.results['optimal_drag_analysis'] = {}
+        
+        node.results['optimal_drag_analysis'][qubit.name] = {
+            'detuning_values': detuning_values,
+            'optimal_state_values': optimal_state_values,
+            'optimal_alphas': optimal_alphas
+        }
+        
+        print(f"\nOptimal DRAG analysis for {qubit.name}:")
+        print(f"  Number of detuning points: {len(detuning_values)}")
+        print(f"  State value range: {optimal_state_values.min():.3f} to {optimal_state_values.max():.3f}")
+        print(f"  DRAG coefficient range: {optimal_alphas.min():.3f} to {optimal_alphas.max():.3f}")
+        
+        plt.tight_layout()
+        plt.show()
+        
+        # Store the figure in results
+        if 'optimal_drag_figures' not in node.results:
+            node.results['optimal_drag_figures'] = {}
+        node.results['optimal_drag_figures'][qubit.name] = fig
 
     # %% {Update_state}
     

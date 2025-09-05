@@ -1,10 +1,10 @@
 from qiskit import QuantumCircuit
 import numpy as np
-from typing import List, Tuple, Dict, Union
+from typing import List, Union
 
 from qiskit.circuit import QuantumCircuit
 from qiskit.converters import circuit_to_dag, dag_to_circuit
-from iqcc_calibration_tools.quam_config.experiments.rb.rb_utils import EPS
+from calibration_utils.two_qubit_interleaved_rb.rb_utils import EPS
 
 # Gate to integer mapping for single qubit gates
 SINGLE_QUBIT_GATE_MAP = {

@@ -31,15 +31,15 @@ g = QualibrationGraph(
     name="retune_graph_qc_qwfix",
     parameters=parameters,
     nodes={
-        "resonator_spectroscopy_vs_flux": library.nodes["02b_Resonator_Spectroscopy_vs_Flux"].copy(name="resonator_spectroscopy_vs_flux",
+        "resonator_spectroscopy_vs_flux": library.nodes["02c_resonator_spectroscopy_vs_flux"].copy(name="resonator_spectroscopy_vs_flux",
         num_averages=20,
         min_flux_offset_in_v=-0.3,
         max_flux_offset_in_v=0.3,
         num_flux_points=101,
         simulate=simulate),
-        "qubit_spectroscopy": library.nodes["03a_Qubit_Spectroscopy"].copy(name="qubit_spectroscopy",
+        "qubit_spectroscopy": library.nodes["03a_qubit_spectroscopy"].copy(name="qubit_spectroscopy",
         simulate=simulate),
-         "qubit_spectroscopy_vs_flux": library.nodes["03b_Qubit_Spectroscopy_vs_Flux"].copy(name="qubit_spectroscopy_vs_flux",
+         "qubit_spectroscopy_vs_flux": library.nodes["03b_qubit_spectroscopy_vs_flux"].copy(name="qubit_spectroscopy_vs_flux",
         num_averages=75,
         frequency_span_in_mhz=35,
         frequency_step_in_mhz=0.5,
@@ -47,18 +47,18 @@ g = QualibrationGraph(
         max_flux_offset_in_v=0.005,
         multiplexed=True,
         simulate=simulate), # this is a specific configuration found for the qwfix chip and also forced by the data error of the DGX QOP
-        "power_rabi_x180": library.nodes["04_Power_Rabi"].copy(    
+        "power_rabi_x180": library.nodes["04b_power_rabi"].copy(    
             name="power_rabi_x180",
             simulate=simulate
         ),
         "T1": library.nodes["05_T1"].copy(name="T1", 
         multiplexed=True,
         simulate=simulate),
-        "T2Ramsey": library.nodes["06_Ramsey"].copy(name="T2Ramsey",
+        "T2Ramsey": library.nodes["06_ramsey"].copy(name="T2Ramsey",
         simulate=simulate),
-        "readout_frequency_optimization": library.nodes["07a_Readout_Frequency_Optimization"].copy(name="readout_frequency_optimization",
+        "readout_frequency_optimization": library.nodes["08a_readout_frequency_optimization"].copy(name="readout_frequency_optimization",
         simulate=simulate),
-        "readout_power_optimization": library.nodes["07c_Readout_Power_Optimization"].copy(name="readout_power_optimization",
+        "readout_power_optimization": library.nodes["08b_readout_power_optimization"].copy(name="readout_power_optimization",
         simulate=simulate),
         # "IQ_blobs": library.nodes["07b_IQ_Blobs"].copy(
         #     flux_point_joint_or_independent=flux_point,
@@ -66,13 +66,13 @@ g = QualibrationGraph(
         #     name="IQ_blobs",
         #     reset_type_thermal_or_active="thermal",
         # ),
-        "drag_calibration": library.nodes["09b_DRAG_Calibration_180_minus_180"].copy(name="drag_calibration", 
+        "drag_calibration": library.nodes["10b_drag_calibration_180_minus_180"].copy(name="drag_calibration", 
         min_amp_factor=-1.99,
         max_amp_factor=1.99,
         reset_type_thermal_or_active=reset_type_thermal_or_active,
         simulate=simulate),
         
-        "single_qubit_randomized_benchmarking": library.nodes["10a_Single_Qubit_Randomized_Benchmarking"].copy(
+        "single_qubit_randomized_benchmarking": library.nodes["11a_single_qubit_randomized_benchmarking"].copy(
             
             multiplexed=False, 
             name="single_qubit_randomized_benchmarking",

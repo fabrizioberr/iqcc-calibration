@@ -6,3 +6,4 @@ __pycache__/
 *.pyd
 .Python
 *.identifier
+iqcc_cloud_token_generator.py

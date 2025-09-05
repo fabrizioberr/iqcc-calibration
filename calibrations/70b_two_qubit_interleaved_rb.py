@@ -36,7 +36,7 @@ Prerequisites:
 from datetime import datetime, timezone, timedelta
 from typing import List, Literal, Optional
 from more_itertools import flatten
-from iqcc_calibration_tools.quam_config.experiments.rb.data_utils import RBResult
+from calibration_utils.two_qubit_interleaved_rb.data_utils import RBResult
 import xarray as xr
 
 
@@ -47,15 +47,15 @@ from qualang_tools.multi_user import qm_session
 from qualang_tools.results import progress_counter, fetching_tool
 
 from qualibrate import NodeParameters, QualibrationNode
-from iqcc_calibration_tools.quam_config.experiments.rb.circuit_utils import layerize_quantum_circuit, process_circuit_to_integers
-from iqcc_calibration_tools.quam_config.experiments.rb.qua_utils import QuaProgramHandler
+from calibration_utils.two_qubit_interleaved_rb.circuit_utils import layerize_quantum_circuit, process_circuit_to_integers
+from calibration_utils.two_qubit_interleaved_rb.qua_utils import QuaProgramHandler
 from iqcc_calibration_tools.analysis.plot_utils import plot_samples
-from iqcc_calibration_tools.storage.save_utils import fetch_results_as_xarray, get_node_id
+from iqcc_calibration_tools.storage.save_utils import fetch_results_as_xarray
 
 from iqcc_calibration_tools.quam_config.components import Quam
-from iqcc_calibration_tools.quam_config.experiments.rb.cloud_utils import write_sync_hook
-from iqcc_calibration_tools.quam_config.experiments.rb.rb_utils import InterleavedRB
-from iqcc_calibration_tools.quam_config.experiments.rb.plot_utils import gate_mapping
+from calibration_utils.two_qubit_interleaved_rb.cloud_utils import write_sync_hook
+from calibration_utils.two_qubit_interleaved_rb.rb_utils import InterleavedRB
+from calibration_utils.two_qubit_interleaved_rb.plot_utils import gate_mapping
 
 
 
@@ -80,7 +80,6 @@ class Parameters(NodeParameters):
     seed: int = 0
 
 node = QualibrationNode(name="2Q_interleaved_rb", parameters=Parameters())
-node_id = get_node_id()
 
 # %% {Initialize_QuAM_and_QOP}
 

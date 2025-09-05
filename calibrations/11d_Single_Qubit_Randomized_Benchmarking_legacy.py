@@ -22,7 +22,7 @@ Prerequisites:
 # %% {Imports}
 from datetime import datetime, timezone, timedelta
 from iqcc_calibration_tools.qualibrate_config.qualibrate.node import QualibrationNode, NodeParameters
-from iqcc_calibration_tools.quam_config.components import Quam as QuAM, Transmon
+from iqcc_calibration_tools.quam_config.components import Quam, Transmon
 from iqcc_calibration_tools.quam_config.macros import qua_declaration, active_reset, readout_state
 from iqcc_calibration_tools.analysis.plot_utils import QubitGrid, grid_iter
 from iqcc_calibration_tools.storage.save_utils import fetch_results_as_xarray, load_dataset
@@ -65,7 +65,7 @@ node = QualibrationNode(name="11d_Single_Qubit_Randomized_Benchmarking_legacy", 
 # Class containing tools to help handling units and conversions.
 u = unit(coerce_to_integer=True)
 # Instantiate the QuAM class from the state file
-machine = QuAM.load()
+machine = Quam.load()
 # Generate the OPX and Octave configurations
 
 config = machine.generate_config()
