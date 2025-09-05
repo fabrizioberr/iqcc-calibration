@@ -66,6 +66,66 @@ def fetch_results_as_xarray(handles, qubits, measurement_axis):
     return ds
 
 
+def fetch_single_shot_results_as_xarray(handles, qubits, measurement_axis): #FB saves also single shot data
+    """
+    Fetches measurement results as an xarray dataset.
+
+    Parameters:
+    - handles : dict
+        A dictionary containing stream handles, e.g. job.result_handles
+    - qubits : list
+        A list of qubits.
+    - measurement_axis : dict
+        Dictionary describing measurement axes, e.g. {"t": idle_times, "repetition": n_reps}
+
+    Returns:
+    - ds : xarray.Dataset
+        Dataset containing results with dims ["qubit", *measurement_axis.keys()]
+    """
+
+    stream_handles = handles.keys()
+    meas_vars = list(
+        set([extract_string(handle) for handle in stream_handles if extract_string(handle) is not None])
+    )
+
+    values = []
+    for meas_var in meas_vars:
+        qubit_data = []
+        for i, qubit in enumerate(qubits):
+            raw = handles.get(f"{meas_var}{i + 1}").fetch_all()
+            arr = np.squeeze(raw)  # remove leading (1,1,...)
+            # Try to match axis order
+            expected_shape = [len(v) if not np.isscalar(v) else v for v in measurement_axis.values()]
+            if list(arr.shape) != expected_shape:
+                # Try transposing if it's just permuted
+                if sorted(arr.shape) == sorted(expected_shape):
+                    perm = [arr.shape.index(s) for s in expected_shape]
+                    arr = np.transpose(arr, perm)
+                else:
+                    raise ValueError(
+                        f"Shape mismatch for {meas_var}{i+1}: got {arr.shape}, expected {expected_shape}"
+                    )
+            qubit_data.append(arr)
+        values.append(np.array(qubit_data))  # shape: (n_qubits, *axis_sizes)
+
+    # Add qubit names once
+    coords = {"qubit": [qubit.name for qubit in qubits], **measurement_axis}
+
+    # Define final axes: qubit first, then all user axes
+    ordered_axes = ["qubit"] + list(measurement_axis.keys())
+
+    ds = xr.Dataset(
+        {
+            meas_var: (ordered_axes, values[i])
+            for i, meas_var in enumerate(meas_vars)
+        },
+        coords=coords,
+    )
+
+    return ds
+
+
+
 def get_storage_path():
     settings = get_settings(get_config_path())
     storage_location = settings.qualibrate.storage.location

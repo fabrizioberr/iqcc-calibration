@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+
 from iqcc_calibration_tools.quam_config.lib import guess
 from scipy.optimize import curve_fit
 import numpy as np
