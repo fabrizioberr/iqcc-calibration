@@ -53,7 +53,15 @@ node = QualibrationNode[Parameters, Quam](
 @node.run_action(skip_if=node.modes.external)
 def custom_param(node: QualibrationNode[Parameters, Quam]):
     # You can get type hinting in your IDE by typing node.parameters.
-    # node.parameters.qubits = ["q1", "q3"]
+    node.parameters.num_shots= 20
+ #   node.parameters.qubits = ["Q2"]
+    node.parameters.multiplexed = True
+    node.parameters.reset_type = 'active'
+    node.parameters.flux_offset_span_in_v = 0.2
+    node.parameters.num_flux_points = 51
+    node.parameters.frequency_span_in_mhz = 500
+    node.parameters.frequency_step_in_mhz = 2
+    node.parameters.operation_amplitude_factor = 0.5
 
     pass
 
@@ -84,7 +92,8 @@ def create_qua_program(node: QualibrationNode[Parameters, Quam]):
     # Qubit detuning sweep with respect to their resonance frequencies
     span = node.parameters.frequency_span_in_mhz * u.MHz
     step = node.parameters.frequency_step_in_mhz * u.MHz
-    dfs = np.arange(-span / 2, +span / 2, step)
+    dfs = np.arange(-span * 8 / 10, +span * 2/ 10, step)
+    
     # Flux bias sweep in V
     span = node.parameters.flux_offset_span_in_v * u.V
     num = node.parameters.num_flux_points
@@ -268,3 +277,5 @@ def update_state(node: QualibrationNode[Parameters, Quam]):
 @node.run_action()
 def save_results(node: QualibrationNode[Parameters, Quam]):
     node.save()
+
+# %%
