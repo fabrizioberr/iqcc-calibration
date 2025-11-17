@@ -57,7 +57,10 @@ node = QualibrationNode[Parameters, Quam](
 def custom_param(node: QualibrationNode[Parameters, Quam]):
     """Allow the user to locally set the node parameters for debugging purposes, or execution in the Python IDE."""
     # You can get type hinting in your IDE by typing node.parameters.
-    # node.parameters.qubits = ["q1", "q2"]
+    node.parameters.qubits = ["Q4"]
+    node.parameters.num_shots = 15
+    node.parameters.max_wait_time_in_ns = 1000
+    node.parameters.simulate = True
     pass
 
 
@@ -122,6 +125,7 @@ def create_qua_program(node: QualibrationNode[Parameters, Quam]):
                     with for_(*from_array(t, pulse_durations // 4)):
                         # Qubit initialization
                         for i, qubit in multiplexed_qubits.items():
+        
                             # Set the xy drive frequency back to the qubit frequency for active reset
                             qubit.xy.update_frequency(qubit.xy.intermediate_frequency)
                             qubit.reset(node.parameters.reset_type, node.parameters.simulate)
@@ -130,6 +134,11 @@ def create_qua_program(node: QualibrationNode[Parameters, Quam]):
                         align()
                         # Qubit manipulation
                         for i, qubit in multiplexed_qubits.items():
+                            qubit.z.play(
+                            "const",
+                            amplitude_scale=0.0396 / qubit.z.operations["const"].amplitude,
+                            duration=t,)
+                            #qubit.xy.wait(40)
                             qubit.xy.play("x180", duration=t)
                         align()
 
